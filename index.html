@@ -405,51 +405,58 @@
             let currentPage = 1;
             const totalPages = 23; // Total number of pages
             let isOpen = false;
+            let autoSwitchInterval;
+
             envelope.on('click', handleEnvelope);
             openBtn.on('click', handleEnvelope);
             resetBtn.on('click', resetEnvelope);
-            nextBtn.on('click', nextLyric);
+
             function handleEnvelope() {
                 if (!isOpen) {
                     openEnvelope();
-                } else {
-                    nextLyric();
                 }
             }
+
             function openEnvelope() {
                 envelope.removeClass("close").addClass("open");
                 isOpen = true;
-                
+
                 openBtn.hide();
-                nextBtn.show().text("Next");
+                nextBtn.hide();
+                startAutoSwitch();
             }
-            function nextLyric() {
-                if (currentPage < totalPages) {
-                    currentPage++;
-                    updateActivePage();
-                    
-                    if (currentPage === totalPages) {
-                        nextBtn.text("Back");
+
+            function startAutoSwitch() {
+                autoSwitchInterval = setInterval(() => {
+                    if (currentPage < totalPages) {
+                        currentPage++;
+                        updateActivePage();
+                    } else {
+                        clearInterval(autoSwitchInterval);
+                        redirectToWebsite();
                     }
-                } else {
-                    currentPage = 1;
-                    updateActivePage();
-                    nextBtn.text("Next");
-                }
+                }, 2000); // Switch page every 2 seconds
             }
+
             function updateActivePage() {
                 $(".lyric-page").removeClass("active");
                 $("#page" + currentPage).addClass("active");
             }
+
             function resetEnvelope() {
                 envelope.removeClass("open").addClass("close");
                 isOpen = false;
+                clearInterval(autoSwitchInterval);
                 setTimeout(function() {
                     currentPage = 1;
                     updateActivePage();
                     openBtn.show();
                     nextBtn.hide();
                 }, 600);
+            }
+
+            function redirectToWebsite() {
+                window.location.href = "https://www.youtube.com/"; // Replace with your desired URL
             }
         });
     </script>
